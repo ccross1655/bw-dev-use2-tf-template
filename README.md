@@ -12,6 +12,7 @@ This template provides an operationally sound Azure foundation for multi-environ
 - Azure Policy enforcement for allowed regions and required tags
 - environment-specific state and deployment roots
 - shared governance and naming patterns across teams
+- dual-region hub-and-spoke networking with East US primary and Central US DR
 
 ## Architecture modeled
 
@@ -31,6 +32,19 @@ Subscription alignment modeled in the template:
 - Dev -> `mg-bw-lz-nonprod`
 - Test -> `mg-bw-lz-nonprod`
 - Prod -> `mg-bw-lz-prod`
+
+## Network CIDR plan
+
+The networking module uses the approved address plan from the architecture:
+
+| Environment | Primary East US | DR Central US |
+| --- | --- | --- |
+| Product spoke - prod | `10.180.100.0/24` | `10.190.100.0/24` |
+| Product spoke - test | `10.180.200.0/24` | `10.190.200.0/24` |
+| Product spoke - dev | `10.180.250.0/24` | `10.190.250.0/24` |
+| Shared / Operations hub | `10.180.240.0/22` | `10.190.240.0/22` |
+
+Each VNet receives five `/27` subnets: private availability zone 1 and 2, public availability zone 1 and 2, and private endpoints. The reserved `/19` blocks from the design are intentionally not provisioned by Terraform and remain available for future expansion.
 
 ## Standards followed
 
@@ -56,7 +70,8 @@ This repository follows the Terraform standardization guidance for Azure:
 │   ├── management_groups/
 │   ├── policy_baseline/
 │   ├── subscription_assignments/
-│   └── identity/
+│   ├── identity/
+│   └── network/
 ├── environments/
 │   ├── bootstrap/
 │   ├── shared/
@@ -87,8 +102,9 @@ This scaffold is production-oriented but still requires tenant-specific values b
 2. Confirm environment-specific state storage names.
 3. Assign required tags and valid project metadata.
 4. Apply bootstrap module to create management groups and policy baseline.
-5. Apply environment roots to create landing-zone resources.
-6. Validate with `terraform validate` and review plans in CI before production apply.
+5. Apply the shared network and environment network roots.
+6. Apply environment roots to create landing-zone resources and workloads.
+7. Validate with `terraform validate` and review plans in CI before production apply.
 
 ## Verification
 

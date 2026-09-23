@@ -1,18 +1,3 @@
-terraform {
-  required_version = ">= 1.10.0"
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-}
-
 module "management_groups" {
   source = "../../modules/management_groups"
 
@@ -59,28 +44,4 @@ module "subscription_assignments" {
       display_name        = "Prod"
     }
   }
-}
-
-output "root_management_group_id" {
-  value = module.management_groups.root_id
-}
-
-output "platform_management_group_id" {
-  value = module.management_groups.platform_id
-}
-
-output "platform_ops_management_group_id" {
-  value = module.management_groups.platform_ops_id
-}
-
-output "nonprod_management_group_id" {
-  value = module.management_groups.nonprod_id
-}
-
-output "prod_management_group_id" {
-  value = module.management_groups.prod_id
-}
-
-output "subscription_assignments" {
-  value = module.subscription_assignments.associations
 }

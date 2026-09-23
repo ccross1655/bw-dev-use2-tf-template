@@ -1,6 +1,6 @@
-resource "azurerm_policy_assignment" "allowed_locations" {
+resource "azurerm_management_group_policy_assignment" "allowed_locations" {
   name                 = "${var.prefix}-allowed-locations"
-  scope                = var.scope_id
+  management_group_id  = var.scope_id
   policy_definition_id = var.allowed_locations_policy_id
   description          = "Restrict Azure deployment regions to the approved list."
   display_name         = "Allowed locations"
@@ -12,9 +12,9 @@ resource "azurerm_policy_assignment" "allowed_locations" {
   })
 }
 
-resource "azurerm_policy_assignment" "require_tags" {
+resource "azurerm_management_group_policy_assignment" "require_tags" {
   name                 = "${var.prefix}-require-tags"
-  scope                = var.scope_id
+  management_group_id  = var.scope_id
   policy_definition_id = var.require_tag_policy_id
   description          = "Require governance tags on resources and resource groups."
   display_name         = "Require tags"
@@ -28,10 +28,10 @@ resource "azurerm_policy_assignment" "require_tags" {
 
 output "allowed_locations_assignment_id" {
   description = "ID of the allowed locations assignment."
-  value       = azurerm_policy_assignment.allowed_locations.id
+  value       = azurerm_management_group_policy_assignment.allowed_locations.id
 }
 
 output "require_tags_assignment_id" {
   description = "ID of the require tags assignment."
-  value       = azurerm_policy_assignment.require_tags.id
+  value       = azurerm_management_group_policy_assignment.require_tags.id
 }
