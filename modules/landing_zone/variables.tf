@@ -30,6 +30,16 @@ variable "proj" {
   type        = string
 }
 
+variable "subscription_name" {
+  description = "Logical Azure subscription name for environment mapping."
+  type        = string
+}
+
+variable "management_group_id" {
+  description = "Management group ID associated with this landing zone."
+  type        = string
+}
+
 variable "workload_name" {
   description = "Logical workload name."
   type        = string

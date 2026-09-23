@@ -55,5 +55,10 @@ output "log_analytics_workspace_id" {
 
 output "management_group_name" {
   description = "Management group name associated with the landing zone."
-  value       = var.workload_name
+  value       = var.management_group_id
+}
+
+output "subscription_name" {
+  description = "Subscription name associated with this landing zone."
+  value       = var.subscription_name
 }
