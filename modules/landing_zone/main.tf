@@ -17,39 +17,6 @@ provider "azurerm" {
   features {}
 }
 
-variable "env" {
-  type = string
-}
-
-variable "region_token" {
-  type = string
-}
-
-variable "location" {
-  type = string
-}
-
-variable "proj" {
-  type = string
-}
-
-variable "subscription_name" {
-  type = string
-}
-
-variable "management_group_id" {
-  type = string
-}
-
-variable "tenant_root_group_name" {
-  type    = string
-  default = "mg-bw"
-}
-
-variable "common_tags" {
-  type = map(string)
-}
-
 module "naming" {
   source = "../naming"
 
@@ -67,24 +34,26 @@ resource "azurerm_resource_group" "platform" {
   tags     = var.common_tags
 }
 
-resource "azurerm_management_group" "tenant" {
-  name = var.tenant_root_group_name
-
-  lifecycle {
-    ignore_changes = [display_name]
-  }
-}
-
-resource "azurerm_management_group" "child" {
-  name                       = var.management_group_id
-  display_name               = var.management_group_id
-  parent_management_group_id = azurerm_management_group.tenant.id
+resource "azurerm_log_analytics_workspace" "platform" {
+  name                = "${var.env}-${var.workload_name}-law-${var.region_token}"
+  location            = azurerm_resource_group.platform.location
+  resource_group_name = azurerm_resource_group.platform.name
+  sku                 = var.log_analytics_sku
+  retention_in_days   = 30
+  tags                = var.common_tags
 }
 
 output "resource_group_name" {
-  value = azurerm_resource_group.platform.name
+  description = "Platform resource group name."
+  value       = azurerm_resource_group.platform.name
+}
+
+output "log_analytics_workspace_id" {
+  description = "Log Analytics workspace ID for operational monitoring."
+  value       = azurerm_log_analytics_workspace.platform.id
 }
 
 output "management_group_name" {
-  value = azurerm_management_group.child.name
+  description = "Management group name associated with the landing zone."
+  value       = var.workload_name
 }

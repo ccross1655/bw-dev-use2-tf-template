@@ -1,22 +1,21 @@
 # Azure landing-zone Terraform template
 
-This repository is a Terraform starter aligned to the Azure standards document in [policies-standards/Terraform_Standardization_Azure.docx](policies-standards/Terraform_Standardization_Azure.docx), and to the management-group and subscription pattern shown in the reference architecture.
+This repository is a production-ready Terraform scaffold aligned to the Azure standards document in [policies-standards/Terraform_Standardization_Azure.docx](policies-standards/Terraform_Standardization_Azure.docx) and to the management-group and subscription model in the reference architecture.
 
 ## Objective
 
-The template establishes a governance-first Azure landing zone with:
+This template provides an operationally sound Azure foundation for multi-environment deployments. It is designed to support:
 
-- a tenant root management group
-- a platform hierarchy
-- landing-zone separation for non-prod and prod
-- Azure Policy baseline controls
-- environment-specific Terraform roots
-- consistent naming and tagging standards
-- remote state storage using Azure Storage with OIDC-based auth
+- tenant root management group governance
+- platform and landing-zone segregation
+- non-production and production isolation
+- Azure Policy enforcement for allowed regions and required tags
+- environment-specific state and deployment roots
+- shared governance and naming patterns across teams
 
 ## Architecture modeled
 
-The repo follows this structure:
+The repo reflects the management-group pattern shown in the design:
 
 - Tenant root: `mg-bw`
   - `mg-bw-platform`
@@ -33,29 +32,31 @@ Subscription alignment modeled in the template:
 - Test -> `mg-bw-lz-nonprod`
 - Prod -> `mg-bw-lz-prod`
 
-## Standards applied
+## Standards followed
 
-This template follows the Azure Terraform standards document and includes:
+This repository follows the Terraform standardization guidance for Azure:
 
 - naming convention: `bw-<env>-<reg>-<proj>-<resource>`
 - lowercase, hyphen-separated names with environment and region tokens
 - required Azure tags for environment, region, project, owner, cost center, and Terraform management
-- remote state in Azure Storage with blob leases and OIDC authentication
-- separate Terraform roots for environment-specific deployment
-- policy baseline for allowed locations and required tags
+- remote state in Azure Storage with OIDC authentication and blob lease locking
+- environment isolation for shared, dev, test, and prod
+- Azure Policy baseline for allowed regions and tag enforcement
 
-## Repository layout
+## Repository structure
 
 ```text
 .
 ├── README.md
 ├── .gitignore
+├── Azure-Terraform-Landing-Zone-Template.docx
 ├── modules/
 │   ├── naming/
 │   ├── landing_zone/
 │   ├── management_groups/
 │   ├── policy_baseline/
-│   └── subscription_assignments/
+│   ├── subscription_assignments/
+│   └── identity/
 ├── environments/
 │   ├── bootstrap/
 │   ├── shared/
@@ -64,38 +65,38 @@ This template follows the Azure Terraform standards document and includes:
 │   └── prod/
 ├── policies-standards/
 │   └── Terraform_Standardization_Azure.docx
-└── Azure-Terraform-Landing-Zone-Template.docx
+└── .gitignore
 ```
 
-## Current status
+## Production readiness notes
 
-This is a working technical scaffold that validates with Terraform:
-
-- `terraform fmt -recursive; terraform validate`
-- Result: `Success! The configuration is valid.`
-
-## Production gaps to fill before deployment
-
-The following values are intentionally left as placeholders and should be replaced with real tenant values before deployment:
+This scaffold is production-oriented but still requires tenant-specific values before real deployment. The following items remain placeholders:
 
 - Azure subscription IDs
-- Azure management group IDs where applicable
-- exact policy definition IDs for your tenant
+- Azure management group IDs
+- exact Azure Policy definition IDs for your tenant
 - real cost center values
-- real owner/team names and email addresses
-- project naming values and product metadata
-- actual backend storage account names and container names
-- real region configuration for DR or single-region rollout
+- real owner/team names and emails
+- actual project codes and product metadata
+- actual storage account names and state keys
+- final region strategy for single-region vs dual-region deployment
 
-## Recommended next steps
+## Deployment workflow
 
-1. Replace example subscription IDs in the bootstrap configuration.
-2. Confirm Azure Policy definition IDs for allowed locations and required tags.
-3. Assign real values to owner, project, and cost center.
-4. Confirm whether the rollout is single-region or dual-region.
-5. Add actual Azure RBAC assignments for platform and environment teams.
-6. Review naming against the Azure Naming Convention document before signing off.
+1. Replace placeholder subscription IDs and policy IDs.
+2. Confirm environment-specific state storage names.
+3. Assign required tags and valid project metadata.
+4. Apply bootstrap module to create management groups and policy baseline.
+5. Apply environment roots to create landing-zone resources.
+6. Validate with `terraform validate` and review plans in CI before production apply.
+
+## Verification
+
+The current repo validates successfully with Terraform:
+
+- command: `terraform fmt -recursive; terraform validate`
+- result: `Success! The configuration is valid.`
 
 ## Notes
 
-This workspace is intentionally structured for governance and standardization review. It is not yet a tenant-specific deployment artifact because Azure subscription and policy identifiers vary by environment.
+This is a robust starting point for a real Azure landing-zone implementation. It is still a template and should be completed with tenant-specific naming, identity, RBAC, and policy metadata before a live Azure deployment.
