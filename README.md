@@ -13,6 +13,7 @@ This template provides an operationally sound Azure foundation for multi-environ
 - environment-specific state and deployment roots
 - shared governance and naming patterns across teams
 - dual-region hub-and-spoke networking with East US primary and Central US DR
+- centralized tenant configuration loaded from `config/tenant.yaml`
 
 ## Architecture modeled
 
@@ -62,6 +63,9 @@ This repository follows the Terraform standardization guidance for Azure:
 ```text
 .
 ├── README.md
+├── config/
+│   ├── tenant.yaml.example
+│   └── tenant.yaml                 # local only; not committed
 ├── .gitignore
 ├── Azure-Terraform-Landing-Zone-Template.docx
 ├── modules/
@@ -96,15 +100,24 @@ This scaffold is production-oriented but still requires tenant-specific values b
 - actual storage account names and state keys
 - final region strategy for single-region vs dual-region deployment
 
+## Central configuration
+
+Copy `config/tenant.yaml.example` to `config/tenant.yaml` and update that one file with your tenant-specific subscription IDs, management-group names, policy definition IDs, tags, regions, and CIDR blocks. The Terraform environment roots load this file with `yamldecode()`.
+
+```powershell
+Copy-Item config/tenant.yaml.example config/tenant.yaml
+```
+
+The real `config/tenant.yaml` is ignored by Git. Do not put secrets in it. Backend storage settings remain in each `backend.tf` because Terraform initializes the backend before it evaluates normal configuration; update those values separately before `terraform init`.
+
 ## Deployment workflow
 
-1. Replace placeholder subscription IDs and policy IDs.
-2. Confirm environment-specific state storage names.
-3. Assign required tags and valid project metadata.
-4. Apply bootstrap module to create management groups and policy baseline.
-5. Apply the shared network and environment network roots.
-6. Apply environment roots to create landing-zone resources and workloads.
-7. Validate with `terraform validate` and review plans in CI before production apply.
+1. Copy and update `config/tenant.yaml`.
+2. Confirm environment-specific state storage names in each `backend.tf`.
+3. Apply bootstrap module to create management groups and policy baseline.
+4. Apply the shared network and environment network roots.
+5. Apply environment roots to create landing-zone resources and workloads.
+6. Validate with `terraform validate` and review plans in CI before production apply.
 
 ## Verification
 

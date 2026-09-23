@@ -23,7 +23,3 @@ output "keyvault_name" {
   value       = local.keyvault_name
 }
 
-output "common_tags" {
-  description = "Common Azure tags required by company policy."
-  value       = local.common_tags
-}

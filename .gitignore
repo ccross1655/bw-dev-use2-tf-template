@@ -13,3 +13,4 @@ terraform.rc
 .idea/
 .vscode/
 .DS_Store
+/config/tenant.yaml

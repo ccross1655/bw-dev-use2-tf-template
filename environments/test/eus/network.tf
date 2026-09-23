@@ -1,11 +1,11 @@
 module "test_network" {
   source = "../../../modules/network"
 
-  name_prefix           = "bw-test-eus-infra"
-  primary_location      = "eastus"
-  dr_location           = "centralus"
-  primary_address_space = "10.180.200.0/24"
-  dr_address_space      = "10.190.200.0/24"
+  name_prefix           = "bw-${local.env}-${local.region_token}-${local.proj}"
+  primary_location      = local.config.regions.primary.location
+  dr_location           = local.config.regions.dr.location
+  primary_address_space = local.environment.primary_address_space
+  dr_address_space      = local.environment.dr_address_space
   common_tags           = local.common_tags
 }
 

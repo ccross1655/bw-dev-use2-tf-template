@@ -1,0 +1,72 @@
+tenant:
+  root_name: mg-bw
+
+management_groups:
+  platform: mg-bw-platform
+  platform_ops: mg-bw-platform-ops
+  landing_zones: mg-bw-landingzones
+  nonprod: mg-bw-lz-nonprod
+  prod: mg-bw-lz-prod
+  sandbox: mg-bw-sandbox
+
+subscriptions:
+  shared:
+    id: 00000000-0000-0000-0000-000000000000
+    name: bw-shared
+  dev:
+    id: 11111111-1111-1111-1111-111111111111
+    name: bw-dev
+  test:
+    id: 22222222-2222-2222-2222-222222222222
+    name: bw-test
+  prod:
+    id: 33333333-3333-3333-3333-333333333333
+    name: bw-prod
+
+policies:
+  allowed_locations:
+    - eastus
+    - centralus
+  allowed_locations_definition_id: /providers/Microsoft.Authorization/policyDefinitions/REPLACE_ALLOWED_LOCATIONS_POLICY_ID
+  require_tags_definition_id: /providers/Microsoft.Authorization/policyDefinitions/REPLACE_REQUIRE_TAGS_POLICY_ID
+
+tags:
+  Project: Global
+  Product: Global
+  ProductVersion: "1.0"
+  Owner: ops@example.com
+  CostCenter: "0000"
+  ManagedBy: Terraform
+  CreatedDate: "REPLACE_WITH_CREATION_DATE"
+  CreatedBy: REPLACE_WITH_AZURE_OBJECT_ID
+  Version: "1.0"
+
+regions:
+  primary:
+    token: eus
+    location: eastus
+  dr:
+    token: cus
+    location: centralus
+
+environments:
+  shared:
+    project: infra
+    primary_address_space: 10.180.240.0/22
+    dr_address_space: 10.190.240.0/22
+    management_group: platform_ops
+  dev:
+    project: infra
+    primary_address_space: 10.180.250.0/24
+    dr_address_space: 10.190.250.0/24
+    management_group: nonprod
+  test:
+    project: infra
+    primary_address_space: 10.180.200.0/24
+    dr_address_space: 10.190.200.0/24
+    management_group: nonprod
+  prod:
+    project: infra
+    primary_address_space: 10.180.100.0/24
+    dr_address_space: 10.190.100.0/24
+    management_group: prod

@@ -1,22 +1,28 @@
+locals {
+  config = yamldecode(file("${path.root}/../../config/tenant.yaml"))
+}
+
 module "management_groups" {
   source = "../../modules/management_groups"
 
-  root_name             = var.tenant_root_name
-  root_display_name     = var.tenant_root_name
-  platform_name         = "mg-bw-platform"
-  platform_display_name = "mg-bw-platform"
-  platform_ops_name     = "mg-bw-platform-ops"
-  landing_zone_name     = "mg-bw-landingzones"
-  nonprod_name          = "mg-bw-lz-nonprod"
-  prod_name             = "mg-bw-lz-prod"
-  sandbox_name          = "mg-bw-sandbox"
+  root_name             = local.config.tenant.root_name
+  root_display_name     = local.config.tenant.root_name
+  platform_name         = local.config.management_groups.platform
+  platform_display_name = local.config.management_groups.platform
+  platform_ops_name     = local.config.management_groups.platform_ops
+  landing_zone_name     = local.config.management_groups.landing_zones
+  nonprod_name          = local.config.management_groups.nonprod
+  prod_name             = local.config.management_groups.prod
+  sandbox_name          = local.config.management_groups.sandbox
 }
 
 module "policy_baseline" {
   source = "../../modules/policy_baseline"
 
-  scope_id          = module.management_groups.root_id
-  allowed_locations = var.allowed_locations
+  scope_id                    = module.management_groups.root_id
+  allowed_locations           = local.config.policies.allowed_locations
+  allowed_locations_policy_id = local.config.policies.allowed_locations_definition_id
+  require_tag_policy_id       = local.config.policies.require_tags_definition_id
 }
 
 module "subscription_assignments" {
@@ -24,22 +30,22 @@ module "subscription_assignments" {
 
   assignments = {
     shared = {
-      subscription_id     = "00000000-0000-0000-0000-000000000000"
+      subscription_id     = local.config.subscriptions.shared.id
       management_group_id = module.management_groups.platform_ops_id
       display_name        = "Shared / Operations"
     }
     dev = {
-      subscription_id     = "11111111-1111-1111-1111-111111111111"
+      subscription_id     = local.config.subscriptions.dev.id
       management_group_id = module.management_groups.nonprod_id
       display_name        = "Dev"
     }
     test = {
-      subscription_id     = "22222222-2222-2222-2222-222222222222"
+      subscription_id     = local.config.subscriptions.test.id
       management_group_id = module.management_groups.nonprod_id
       display_name        = "Test"
     }
     prod = {
-      subscription_id     = "33333333-3333-3333-3333-333333333333"
+      subscription_id     = local.config.subscriptions.prod.id
       management_group_id = module.management_groups.prod_id
       display_name        = "Prod"
     }

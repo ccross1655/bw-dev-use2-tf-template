@@ -3,24 +3,13 @@ provider "azurerm" {
 }
 
 locals {
+  config       = yamldecode(file("${path.root}/../../../config/tenant.yaml"))
+  environment  = local.config.environments.shared
   env          = "shared"
-  region_token = "eus"
-  location     = "eastus"
-  proj         = "infra"
-
-  common_tags = {
-    Environment    = local.env
-    Region         = local.region_token
-    Project        = "Global"
-    Product        = "Global"
-    ProductVersion = "1.0"
-    Owner          = "ops@example.com"
-    CostCenter     = "0000"
-    ManagedBy      = "Terraform"
-    CreatedDate    = "2026-09-22T00:00:00Z"
-    CreatedBy      = "00000000-0000-0000-0000-000000000000"
-    Version        = "1.092226.0000"
-  }
+  region_token = local.config.regions.primary.token
+  location     = local.config.regions.primary.location
+  proj         = local.environment.project
+  common_tags  = merge(local.config.tags, { Environment = local.env, Region = local.region_token })
 }
 
 module "shared_platform" {
@@ -30,8 +19,8 @@ module "shared_platform" {
   region_token        = local.region_token
   location            = local.location
   proj                = local.proj
-  subscription_name   = "bw-shared"
-  management_group_id = "mg-bw-platform-ops"
+  subscription_name   = local.config.subscriptions.shared.name
+  management_group_id = local.config.management_groups[local.environment.management_group]
   common_tags         = local.common_tags
 }
 
